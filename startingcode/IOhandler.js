@@ -5,7 +5,6 @@ const PNG = require("pngjs").PNG;
 const stream = require("node:stream/promises");
 const path = require("path");
 const yauzl = require("yauzl-promise");
-const { log } = require("node:console");
 
 // const isPng = () => {
 //     return new Transform ({
@@ -23,7 +22,6 @@ const { log } = require("node:console");
  * @param {string} pathOut
  * @return {promise}
  */
-
 
 const unzip = async (pathIn, pathOut) => {
     await fs.mkdir(pathOut, {recursive: true});
@@ -61,24 +59,24 @@ const readDir = async (dir) => {
  * @param pathIn
  * @param pathOut
  */
-const grayScale = (pathIn, pathOut) => {    
+const grayScale = (pathIn, pathOut) => {  
+  console.log(`step 1 \n`);
+  fs.mkdir(path.join(`startingcode`,`grayscaled`), {recursive: true})
   createReadStream(pathIn)
   .pipe(
-    new PNG({
-      filterType: 4
-        })
+    new PNG()
     )
     .on("parsed", function () {
+        console.log(`step 2 \n`);
         for (var y = 0; y < this.height; y++) {
           for (var x = 0; x < this.width; x++) {
             var idx = (this.width * y + x) << 2;
-            this.data[idx] = this.data[idx] / 255;
-            this.data[idx + 1] = this.data[idx + 1] / 255;
-            this.data[idx + 2] = this.data[idx + 2] / 255;
+            this.data[idx] = this.data[idx] * 0.299;
+            this.data[idx + 1] = this.data[idx + 1] * 0.587;
+            this.data[idx + 2] = this.data[idx + 2] * 0.144;
           }
         }
-        
-    this.pack().pipe(fs.createWriteStream(pathOut));
+    this.pack().pipe(createWriteStream(pathOut));
 })
 }
 
@@ -89,12 +87,12 @@ const grayScale = (pathIn, pathOut) => {
 //     grayScale,
 // };
 async function main() {
-    unzip(path.join("startingcode", "myfile.zip"), path.join("startingcode", "unzipped"));
+    await unzip(path.join("startingcode", "myfile.zip"), path.join("startingcode", "unzipped"));
     const directories = await readDir(path.join("startingcode", "unzipped"))
     console.log(directories);
     for (entry of directories) {
-        console.log(path.join(`startingcode`, `unzipped`, entry));
-        console.log(path.join(`startingcode`, `grayscaled`, entry));
+        console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n` + `${entry}\n` + path.join(`startingcode`, `unzipped`, entry));
+        console.log(path.join(`startingcode`, `grayscaled`, entry) + `\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
         grayScale(path.join(`startingcode`, `unzipped`, entry) , path.join(`startingcode`, `grayscaled`, entry));
     }
 }
