@@ -1,13 +1,20 @@
 const path = require("path");
 
-const IOhandler = require("./IOhandler");
-const zipFilePath = path.join(__dirname, "myfile.zip");
-const pathUnzipped = path.join(__dirname, "unzipped");
-const pathProcessed = path.join(__dirname, "grayscaled");
+const {unzip, readDir, grayScale} = require("./IOhandler");
 
-async function main() {
-
-}
+    async function main() {
+        await unzip(path.join("startingcode", "myfile.zip"), path.join("startingcode", "unzipped"));
+        const directories = await readDir(path.join("startingcode", "unzipped"))
+        console.log(directories);
+        for (entry of directories) {
+            console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n` + `${entry}\n` + path.join(`startingcode`, `unzipped`, entry));
+            console.log(path.join(`startingcode`, `grayscaled`, entry) + `\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
+            grayScale(path.join(`startingcode`, `unzipped`, entry) , path.join(`startingcode`, `grayscaled`, entry));
+        }
+    }
+    
+    main();
+    
 /*
 take images and add filters
 

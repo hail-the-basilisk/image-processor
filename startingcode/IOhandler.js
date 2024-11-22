@@ -71,32 +71,19 @@ const grayScale = (pathIn, pathOut) => {
         for (var y = 0; y < this.height; y++) {
           for (var x = 0; x < this.width; x++) {
             var idx = (this.width * y + x) << 2;
-            this.data[idx] = this.data[idx] * 0.299;
-            this.data[idx + 1] = this.data[idx + 1] * 0.587;
-            this.data[idx + 2] = this.data[idx + 2] * 0.144;
+            const newColor = (this.data[idx] * 0.2126) + (this.data[idx + 1] * 0.7152) + (this.data[idx + 2] * 0.0722);  
+            this.data[idx] = newColor;
+            this.data[idx + 1] = newColor;
+            this.data[idx + 2] = newColor;
           }
         }
     this.pack().pipe(createWriteStream(pathOut));
 })
 }
 
-//
-// module.exports = {
-//     unzip,
-//     readDir,
-//     grayScale,
-// };
-async function main() {
-    await unzip(path.join("startingcode", "myfile.zip"), path.join("startingcode", "unzipped"));
-    const directories = await readDir(path.join("startingcode", "unzipped"))
-    console.log(directories);
-    for (entry of directories) {
-        console.log(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n` + `${entry}\n` + path.join(`startingcode`, `unzipped`, entry));
-        console.log(path.join(`startingcode`, `grayscaled`, entry) + `\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`);
-        grayScale(path.join(`startingcode`, `unzipped`, entry) , path.join(`startingcode`, `grayscaled`, entry));
-    }
-}
 
-main();
-
-
+module.exports = {
+    unzip,
+    readDir,
+    grayScale,
+};
